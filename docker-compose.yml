@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: storesystem
+      POSTGRES_USER: storesystem
+      POSTGRES_PASSWORD: ilovepizza
+
+  backend:
+    build: ./Server
+    depends_on:
+      - db
+    network_mode: host
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./Server/.env
+
+  frontend:
+    build: ./Store
+    depends_on:
+      - backend
+    network_mode: host
+    ports:
+      - "5173:5173"
+    env_file:
+      - ./Store/.env
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+volumes:
+  postgres_data:
